@@ -11,8 +11,8 @@ namespace movieManiaAppBackend
         public static void Register(HttpConfiguration config)
         {
             // Enable CORS globally
-            //var cors = new EnableCorsAttribute("*", "*", "*");
-            //config.EnableCors(cors);
+            var cors = new EnableCorsAttribute("*", "*", "*");
+            config.EnableCors(cors);
 
             // Web API configuration and services
 

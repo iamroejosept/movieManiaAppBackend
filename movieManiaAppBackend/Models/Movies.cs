@@ -10,7 +10,7 @@ namespace movieManiaAppBackend.Models
     {
         public int movie_id { get; set; }
         public string title { get; set; }
-        public float? price { get; set; }
+        public decimal? price { get; set; }
         public int? stock { get; set; }
 
         // Navigation property

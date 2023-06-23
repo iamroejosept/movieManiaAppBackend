@@ -33,13 +33,14 @@ namespace movieManiaAppBackend.Models
             // Configure relationships
             modelBuilder.Entity<Rentals>()
                 .HasRequired(r => r.Customer)
-                .WithMany()
+                .WithMany(c => c.Rentals)
                 .HasForeignKey(r => r.customer_id);
 
             modelBuilder.Entity<Rentals>()
                 .HasRequired(r => r.Movie)
-                .WithMany()
+                .WithMany(m => m.Rentals)
                 .HasForeignKey(r => r.movie_id);
+
 
             base.OnModelCreating(modelBuilder);
         }
