@@ -34,12 +34,14 @@ namespace movieManiaAppBackend.Models
             modelBuilder.Entity<Rentals>()
                 .HasRequired(r => r.Customer)
                 .WithMany(c => c.Rentals)
-                .HasForeignKey(r => r.customer_id);
+                .HasForeignKey(r => r.customer_id)
+                .WillCascadeOnDelete(true);
 
             modelBuilder.Entity<Rentals>()
                 .HasRequired(r => r.Movie)
                 .WithMany(m => m.Rentals)
-                .HasForeignKey(r => r.movie_id);
+                .HasForeignKey(r => r.movie_id)
+                .WillCascadeOnDelete(true);
 
 
             base.OnModelCreating(modelBuilder);
