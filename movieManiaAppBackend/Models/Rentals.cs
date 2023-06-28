@@ -18,5 +18,6 @@ namespace movieManiaAppBackend.Models
         // Navigation properties
         public virtual Customers Customer { get; set; }
         public virtual Movies Movie { get; set; }
+
     }
 }

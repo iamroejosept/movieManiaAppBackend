@@ -60,14 +60,41 @@ namespace movieManiaAppBackend.Controllers
                 return BadRequest(ModelState);
             }
 
+            // Set rental details
+            rental.rental_date = DateTime.Now;
+            rental.return_date = DateTime.Now.AddMonths(1);
+            rental.status = "Pending";
 
+            // Retrieve the movie from the database based on the title
+            var movie = db.Movies.FirstOrDefault(m => m.title == rental.Movie.title);
+            if (movie == null)
+            {
+                return BadRequest("Movie not found.");
+            }
+            rental.movie_id = movie.movie_id;
+            rental.Movie = null; // Remove the movie navigation property
+
+            // Retrieve the customer from the database based on the first name and last name
+            var customer = db.Customers.FirstOrDefault(c =>
+                c.first_name == rental.Customer.first_name &&
+                c.last_name == rental.Customer.last_name);
+
+            if (customer == null)
+            {
+                return BadRequest("Customer not found.");
+            }
+
+            rental.customer_id = customer.customer_id;
+            rental.Customer = null; // Remove the customer navigation property
+
+            // Add rental to the database
             db.Rentals.Add(rental);
             db.SaveChanges();
 
             return CreatedAtRoute("DefaultApi", new { id = rental.rental_id }, rental);
         }
 
-        // PUT api/rentals/{id}
+        // PUT api/rentals
         [HttpPut]
         public IHttpActionResult PutRental(int id, Rentals rental)
         {

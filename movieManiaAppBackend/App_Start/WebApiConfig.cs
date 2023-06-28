@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
 using System.Web.Http.Cors;
+using Newtonsoft.Json;
 
 namespace movieManiaAppBackend
 {
@@ -13,6 +14,9 @@ namespace movieManiaAppBackend
             // Enable CORS globally
             var cors = new EnableCorsAttribute("*", "*", "*");
             config.EnableCors(cors);
+
+            //JSON serializer to ignore the circular references
+            config.Formatters.JsonFormatter.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
 
             // Web API configuration and services
 
