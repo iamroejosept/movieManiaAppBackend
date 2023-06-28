@@ -20,11 +20,24 @@ namespace movieManiaAppBackend.Controllers
         }
 
         // GET api/rentals
-        public IHttpActionResult GetRentals()
+        public IHttpActionResult GetCustomers()
         {
-            List<Rentals> rentals = db.Rentals.ToList();
+            var query = from r in db.Rentals
+                        join c in db.Customers on r.customer_id equals c.customer_id
+                        join m in db.Movies on r.movie_id equals m.movie_id
+                        where r.customer_id != null && r.movie_id != null
+                        select new
+                        {
+                            rental_id = r.rental_id,
+                            title = m.title,
+                            first_name = c.first_name,
+                            last_name = c.last_name,
+                            rental_date = r.rental_date,
+                            return_date = r.return_date,
+                            status = r.status
+                        };
 
-            return Ok(rentals);
+            return Ok(query.ToList());
         }
 
         // GET api/rentals/{id}
