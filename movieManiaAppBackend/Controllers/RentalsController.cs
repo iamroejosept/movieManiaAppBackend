@@ -71,6 +71,16 @@ namespace movieManiaAppBackend.Controllers
             {
                 return BadRequest("Movie not found.");
             }
+
+            // Check if there is enough stock of the movie
+            if (movie.stock <= 0)
+            {
+                return BadRequest("Movie out of stock.");
+            }
+
+            // Decrease the stock of the movie by 1
+            movie.stock--;
+
             rental.movie_id = movie.movie_id;
             rental.Movie = null; // Remove the movie navigation property
 
@@ -89,42 +99,60 @@ namespace movieManiaAppBackend.Controllers
 
             // Add rental to the database
             db.Rentals.Add(rental);
+
+            // Save the updated stock to the database
             db.SaveChanges();
 
             return CreatedAtRoute("DefaultApi", new { id = rental.rental_id }, rental);
         }
 
+
         // PUT api/rentals
         [HttpPut]
-        public IHttpActionResult PutRental(int id, Rentals rental)
+        public IHttpActionResult PutRental(Rentals rental)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            if (id != rental.rental_id)
+            // Retrieve the movie from the database based on the title
+            var movie = db.Movies.FirstOrDefault(m => m.title == rental.Movie.title);
+            if (movie == null)
             {
-                return BadRequest();
+                return BadRequest("Movie not found.");
+            }
+            rental.movie_id = movie.movie_id;
+            rental.Movie = null; // Remove the movie navigation property
+
+            // Retrieve the customer from the database based on the first name and last name
+            var customer = db.Customers.FirstOrDefault(c =>
+                c.first_name == rental.Customer.first_name &&
+                c.last_name == rental.Customer.last_name);
+
+            if (customer == null)
+            {
+                return BadRequest("Customer not found.");
             }
 
-            db.Entry(rental).State = EntityState.Modified;
+            rental.customer_id = customer.customer_id;
+            rental.Customer = null; // Remove the customer navigation property
 
-            try
+            // Retrieve the rental from the database based on the customer_id and movie_id
+            var tempRental = db.Rentals.FirstOrDefault(r => r.movie_id == rental.movie_id &&
+                r.customer_id == rental.customer_id && r.status == "Pending");
+
+            if (tempRental == null)
             {
-                db.SaveChanges();
+                return BadRequest("Rental not found.");
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!RentalExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+
+            //Change the status from Pending to Returned
+            tempRental.status = "Returned";
+
+            db.Entry(tempRental).State = EntityState.Modified;
+
+            db.SaveChanges();
 
             return StatusCode(HttpStatusCode.NoContent);
         }
@@ -142,12 +170,6 @@ namespace movieManiaAppBackend.Controllers
             db.SaveChanges();
 
             return Ok(rental);
-        }
-
-
-        private bool RentalExists(int id)
-        {
-            return db.Rentals.Any(c => c.rental_id == id);
         }
     }
 }
