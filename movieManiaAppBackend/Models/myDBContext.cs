@@ -9,7 +9,7 @@ namespace movieManiaAppBackend.Models
 {
     public class myDBContext: DbContext
     {
-        public myDBContext() : base("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=movieManiaDatabase;Integrated Security=True")
+        public myDBContext() : base("Data Source=localhost\\MSSQLSERVER03;Initial Catalog=movieManiaDatabase;Integrated Security=True")
         {
             Configuration.ProxyCreationEnabled = false; // Disable proxy creation
         }

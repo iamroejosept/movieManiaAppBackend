@@ -22,7 +22,7 @@ namespace movieManiaAppBackend.Controllers
         // GET api/movies
         public IHttpActionResult GetMovies()
         {
-            List<Movies> movies = db.Movies.ToList();
+            List<Movies> movies = db.Movies.OrderByDescending(m => m.movie_id).ToList();
 
             return Ok(movies);
         }

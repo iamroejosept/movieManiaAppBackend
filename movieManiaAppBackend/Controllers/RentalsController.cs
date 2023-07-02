@@ -26,6 +26,7 @@ namespace movieManiaAppBackend.Controllers
                         join c in db.Customers on r.customer_id equals c.customer_id
                         join m in db.Movies on r.movie_id equals m.movie_id
                         where r.customer_id != null && r.movie_id != null
+                        orderby r.rental_id descending 
                         select new
                         {
                             rental_id = r.rental_id,
@@ -39,6 +40,7 @@ namespace movieManiaAppBackend.Controllers
 
             return Ok(query.ToList());
         }
+
 
         // GET api/rentals/{id}
         public IHttpActionResult GetRental(int id)
@@ -100,7 +102,6 @@ namespace movieManiaAppBackend.Controllers
             // Add rental to the database
             db.Rentals.Add(rental);
 
-            // Save the updated stock to the database
             db.SaveChanges();
 
             return CreatedAtRoute("DefaultApi", new { id = rental.rental_id }, rental);
@@ -124,6 +125,9 @@ namespace movieManiaAppBackend.Controllers
             }
             rental.movie_id = movie.movie_id;
             rental.Movie = null; // Remove the movie navigation property
+
+            // Increase the stock of the movie by 1
+            movie.stock++;
 
             // Retrieve the customer from the database based on the first name and last name
             var customer = db.Customers.FirstOrDefault(c =>
@@ -149,6 +153,7 @@ namespace movieManiaAppBackend.Controllers
 
             //Change the status from Pending to Returned
             tempRental.status = "Returned";
+
 
             db.Entry(tempRental).State = EntityState.Modified;
 
