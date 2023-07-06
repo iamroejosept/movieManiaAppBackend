@@ -171,6 +171,7 @@
     <Compile Include="Controllers\CustomersController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\MoviesController.cs" />
+    <Compile Include="Controllers\RentalMoviesController.cs" />
     <Compile Include="Controllers\RentalsController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
     <Compile Include="Global.asax.cs">
@@ -179,6 +180,7 @@
     <Compile Include="Models\Customers.cs" />
     <Compile Include="Models\Movies.cs" />
     <Compile Include="Models\myDBContext.cs" />
+    <Compile Include="Models\RentalMovies.cs" />
     <Compile Include="Models\Rentals.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

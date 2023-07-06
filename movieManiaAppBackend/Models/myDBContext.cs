@@ -17,6 +17,7 @@ namespace movieManiaAppBackend.Models
         public DbSet<Rentals> Rentals { get; set; }
         public DbSet<Movies> Movies { get; set; }
         public DbSet<Customers> Customers { get; set; }
+        public DbSet<RentalMovies> RentalMovies { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -24,11 +25,13 @@ namespace movieManiaAppBackend.Models
             modelBuilder.Entity<Rentals>().ToTable("Rentals");
             modelBuilder.Entity<Movies>().ToTable("Movies");
             modelBuilder.Entity<Customers>().ToTable("Customers");
+            modelBuilder.Entity<RentalMovies>().ToTable("RentalMovies");
 
             // Configure primary keys
             modelBuilder.Entity<Rentals>().HasKey(r => r.rental_id);
             modelBuilder.Entity<Movies>().HasKey(m => m.movie_id);
             modelBuilder.Entity<Customers>().HasKey(c => c.customer_id);
+            modelBuilder.Entity<RentalMovies>().HasKey(rm => new { rm.rental_id, rm.movie_id });
 
             // Configure relationships
             modelBuilder.Entity<Rentals>()
@@ -37,10 +40,16 @@ namespace movieManiaAppBackend.Models
                 .HasForeignKey(r => r.customer_id)
                 .WillCascadeOnDelete(true);
 
-            modelBuilder.Entity<Rentals>()
-                .HasRequired(r => r.Movie)
-                .WithMany(m => m.Rentals)
-                .HasForeignKey(r => r.movie_id)
+            modelBuilder.Entity<RentalMovies>()
+                .HasRequired(rm => rm.Rental)
+                .WithMany(r => r.RentalMovies)
+                .HasForeignKey(rm => rm.rental_id)
+                .WillCascadeOnDelete(true);
+
+            modelBuilder.Entity<RentalMovies>()
+                .HasRequired(rm => rm.Movie)
+                .WithMany(m => m.RentalMovies)
+                .HasForeignKey(rm => rm.movie_id)
                 .WillCascadeOnDelete(true);
 
 

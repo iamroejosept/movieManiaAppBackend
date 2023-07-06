@@ -14,6 +14,6 @@ namespace movieManiaAppBackend.Models
         public int? stock { get; set; }
 
         // Navigation property
-        public virtual ICollection<Rentals> Rentals { get; set; }
+        public virtual ICollection<RentalMovies> RentalMovies { get; set; }
     }
 }
