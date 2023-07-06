@@ -28,14 +28,14 @@ namespace movieManiaAppBackend.Controllers
         }
 
         // GET api/rentalmovies/{id}
-        public IHttpActionResult GetRentalMovie(int id)
+        public IHttpActionResult GetRentalMovies(int id)
         {
-            RentalMovies rentalmovie = db.RentalMovies.FirstOrDefault(rm => rm.rental_id == id);
-            if (rentalmovie == null)
+            List<RentalMovies> rentalMovies = db.RentalMovies.Where(rm => rm.rental_id == id).ToList();
+            if (rentalMovies.Count == 0)
             {
                 return NotFound();
             }
-            return Ok(rentalmovie);
+            return Ok(rentalMovies);
         }
 
         // POST api/rentalmovies
