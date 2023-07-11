@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using movieManiaAppBackend.Models;
+using System.Globalization;
 
 namespace movieManiaAppBackend.Controllers
 {
@@ -45,7 +46,6 @@ namespace movieManiaAppBackend.Controllers
             {
                 return BadRequest(ModelState);
             }
-
 
             db.Customers.Add(customer);
             db.SaveChanges();

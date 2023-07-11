@@ -47,7 +47,6 @@ namespace movieManiaAppBackend.Controllers
                 return BadRequest(ModelState);
             }
 
-
             db.Rentals.Add(rental);
             db.SaveChanges();
 
