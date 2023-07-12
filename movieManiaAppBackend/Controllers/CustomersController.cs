@@ -42,7 +42,10 @@ namespace movieManiaAppBackend.Controllers
         [HttpPost]
         public IHttpActionResult PostCustomer(Customers customer)
         {
-            if (!ModelState.IsValid)
+            
+            if (!ModelState.IsValidField("email") || !ModelState.IsValidField("first_name")
+             || !ModelState.IsValidField("last_name") || !ModelState.IsValidField("date_of_birth")
+             || !ModelState.IsValidField("address"))
             {
                 return BadRequest(ModelState);
             }
@@ -67,7 +70,39 @@ namespace movieManiaAppBackend.Controllers
                 return BadRequest();
             }
 
-            db.Entry(customer).State = EntityState.Modified;
+            // Fetch the existing customer record from the database
+            var existingCustomer = db.Customers.Find(id);
+
+            if (existingCustomer == null)
+            {
+                return NotFound();
+            }
+
+            // Update only the modified fields
+            if (!string.IsNullOrEmpty(customer.email))
+            {
+                existingCustomer.email = customer.email;
+            }
+
+            if (!string.IsNullOrEmpty(customer.first_name))
+            {
+                existingCustomer.first_name = customer.first_name;
+            }
+
+            if (!string.IsNullOrEmpty(customer.last_name))
+            {
+                existingCustomer.last_name = customer.last_name;
+            }
+
+            if (customer.date_of_birth.HasValue)
+            {
+                existingCustomer.date_of_birth = customer.date_of_birth;
+            }
+
+            if (!string.IsNullOrEmpty(customer.address))
+            {
+                existingCustomer.address = customer.address;
+            }
 
             try
             {
@@ -88,7 +123,9 @@ namespace movieManiaAppBackend.Controllers
             return StatusCode(HttpStatusCode.NoContent);
         }
 
+
         // DELETE api/customers/{id}
+        [HttpDelete]
         public IHttpActionResult DeleteCustomer(int id)
         {
             Customers customer = db.Customers.FirstOrDefault(c => c.customer_id == id);

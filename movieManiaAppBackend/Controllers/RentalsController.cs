@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using movieManiaAppBackend.Models;
+using System.Globalization;
 
 namespace movieManiaAppBackend.Controllers
 {
@@ -23,7 +24,6 @@ namespace movieManiaAppBackend.Controllers
         public IHttpActionResult GetRentals()
         {
             List<Rentals> rentals = db.Rentals.OrderByDescending(r => r.rental_id).ToList();
-
             return Ok(rentals);
         }
 
@@ -42,7 +42,9 @@ namespace movieManiaAppBackend.Controllers
         [HttpPost]
         public IHttpActionResult PostRental(Rentals rental)
         {
-            if (!ModelState.IsValid)
+
+            if (!ModelState.IsValidField("customer_id") || !ModelState.IsValidField("rental_date")
+             || !ModelState.IsValidField("return_date") || !ModelState.IsValidField("status"))
             {
                 return BadRequest(ModelState);
             }
@@ -67,7 +69,34 @@ namespace movieManiaAppBackend.Controllers
                 return BadRequest();
             }
 
-            db.Entry(rental).State = EntityState.Modified;
+            // Fetch the existing rental record from the database
+            var existingRental = db.Rentals.Find(id);
+
+            if (existingRental == null)
+            {
+                return NotFound();
+            }
+
+            // Update only the modified fields
+            if (rental.customer_id != null)
+            {
+                existingRental.customer_id = rental.customer_id;
+            }
+
+            if (rental.rental_date.HasValue)
+            {
+                existingRental.rental_date = rental.rental_date;
+            }
+
+            if (rental.return_date.HasValue)
+            {
+                existingRental.return_date = rental.return_date;
+            }
+
+            if (!string.IsNullOrEmpty(rental.status))
+            {
+                existingRental.status = rental.status;
+            }
 
             try
             {
@@ -88,7 +117,9 @@ namespace movieManiaAppBackend.Controllers
             return StatusCode(HttpStatusCode.NoContent);
         }
 
+
         // DELETE api/rentals/{id}
+        [HttpDelete]
         public IHttpActionResult DeleteRental(int id)
         {
             Rentals rental = db.Rentals.FirstOrDefault(r => r.rental_id == id);

@@ -42,7 +42,8 @@ namespace movieManiaAppBackend.Controllers
         [HttpPost]
         public IHttpActionResult PostRentalMovie(RentalMovies rentalmovie)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValidField("rental_id") || !ModelState.IsValidField("movie_id")
+              || !ModelState.IsValidField("individualstatus"))
             {
                 return BadRequest(ModelState);
             }
@@ -54,60 +55,6 @@ namespace movieManiaAppBackend.Controllers
             return CreatedAtRoute("DefaultApi", new { id = rentalmovie.rental_id }, rentalmovie);
         }
 
-        // PUT api/rentalmovies/{id}
-        [HttpPut]
-        public IHttpActionResult PutRentalMovie(int id, RentalMovies rentalmovie)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            if (id != rentalmovie.rental_id)
-            {
-                return BadRequest();
-            }
-
-            db.Entry(rentalmovie).State = EntityState.Modified;
-
-            try
-            {
-                db.SaveChanges();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!RentalMovieExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return StatusCode(HttpStatusCode.NoContent);
-        }
-
-        // DELETE api/rentalmovies/{id}
-        public IHttpActionResult DeleteRentalMovie(int id)
-        {
-            RentalMovies rentalmovie = db.RentalMovies.FirstOrDefault(rm => rm.rental_id == id);
-            if (rentalmovie == null)
-            {
-                return NotFound();
-            }
-
-            db.RentalMovies.Remove(rentalmovie);
-            db.SaveChanges();
-
-            return Ok(rentalmovie);
-        }
-
-
-        private bool RentalMovieExists(int id)
-        {
-            return db.RentalMovies.Any(rm => rm.rental_id == id);
-        }
+        
     }
 }

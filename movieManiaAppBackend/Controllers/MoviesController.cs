@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using movieManiaAppBackend.Models;
+using System.Globalization;
 
 namespace movieManiaAppBackend.Controllers
 {
@@ -23,14 +24,13 @@ namespace movieManiaAppBackend.Controllers
         public IHttpActionResult GetMovies()
         {
             List<Movies> movies = db.Movies.OrderByDescending(m => m.movie_id).ToList();
-
             return Ok(movies);
         }
 
         // GET api/movies/{id}
         public IHttpActionResult GetMovie(int id)
         {
-            Movies movie = db.Movies.FirstOrDefault(c => c.movie_id == id);
+            Movies movie = db.Movies.FirstOrDefault(m => m.movie_id == id);
             if (movie == null)
             {
                 return NotFound();
@@ -42,11 +42,12 @@ namespace movieManiaAppBackend.Controllers
         [HttpPost]
         public IHttpActionResult PostMovie(Movies movie)
         {
-            if (!ModelState.IsValid)
+
+            if (!ModelState.IsValidField("title") || !ModelState.IsValidField("price")
+             || !ModelState.IsValidField("stock"))
             {
                 return BadRequest(ModelState);
             }
-
 
             db.Movies.Add(movie);
             db.SaveChanges();
@@ -68,7 +69,29 @@ namespace movieManiaAppBackend.Controllers
                 return BadRequest();
             }
 
-            db.Entry(movie).State = EntityState.Modified;
+            // Fetch the existing movie record from the database
+            var existingMovie = db.Movies.Find(id);
+
+            if (existingMovie == null)
+            {
+                return NotFound();
+            }
+
+            // Update only the modified fields
+            if (!string.IsNullOrEmpty(movie.title))
+            {
+                existingMovie.title = movie.title;
+            }
+
+            if (movie.price != null)
+            {
+                existingMovie.price = movie.price;
+            }
+
+            if (movie.stock != null)
+            {
+                existingMovie.stock = movie.stock;
+            }
 
             try
             {
@@ -89,10 +112,12 @@ namespace movieManiaAppBackend.Controllers
             return StatusCode(HttpStatusCode.NoContent);
         }
 
+
         // DELETE api/movies/{id}
+        [HttpDelete]
         public IHttpActionResult DeleteMovie(int id)
         {
-            Movies movie = db.Movies.FirstOrDefault(c => c.movie_id == id);
+            Movies movie = db.Movies.FirstOrDefault(m => m.movie_id == id);
             if (movie == null)
             {
                 return NotFound();
@@ -107,7 +132,7 @@ namespace movieManiaAppBackend.Controllers
 
         private bool MovieExists(int id)
         {
-            return db.Movies.Any(c => c.movie_id == id);
+            return db.Movies.Any(m => m.movie_id == id);
         }
     }
 }
