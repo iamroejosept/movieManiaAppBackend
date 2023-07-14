@@ -55,22 +55,13 @@ namespace movieManiaAppBackend.Controllers
             return CreatedAtRoute("DefaultApi", new { id = rentalmovie.rental_id }, rentalmovie);
         }
 
-        // PUT api/rentalmovies/{id}
+        // PUT api/rentalmovies/{rentalId}-{movieId}
         [HttpPut]
-        public IHttpActionResult PutRentalMovie(int id, RentalMovies rentalmovie)
+        [Route("api/rentalmovies/{rentalId}-{movieId}")]
+        public IHttpActionResult PutRentalMovie(int rentalId, int movieId, RentalMovies rentalmovie)
         {
-            /*if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }*/
-
-            if (id != rentalmovie.rental_id)
-            {
-                return BadRequest();
-            }
-
             // Fetch the existing record from the database
-            var existingRentalMovie = db.RentalMovies.Find(id);
+            var existingRentalMovie = db.RentalMovies.Find(rentalId, movieId);
 
             if (existingRentalMovie == null)
             {
@@ -83,14 +74,34 @@ namespace movieManiaAppBackend.Controllers
                 existingRentalMovie.individualstatus = rentalmovie.individualstatus;
             }
 
-
             try
             {
                 db.SaveChanges();
+
+                // Check if all RentalMovies for the rentalId have individualstatus as "Returned"
+                var allReturned = db.RentalMovies
+                    .Where(rm => rm.rental_id == rentalId)
+                    .All(rm => rm.individualstatus == "Returned");
+
+                if (allReturned)
+                {
+                    // Fetch the existing Rentals record from the database
+                    var existingRental = db.Rentals.Find(rentalId);
+
+                    if (existingRental == null)
+                    {
+                        return NotFound();
+                    }
+
+                    // Update the status of the rental to "Returned"
+                    existingRental.status = "Returned";
+
+                    db.SaveChanges();
+                }
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!RentalMovieExists(id))
+                if (!RentalMovieExists(rentalId, movieId))
                 {
                     return NotFound();
                 }
@@ -103,10 +114,12 @@ namespace movieManiaAppBackend.Controllers
             return StatusCode(HttpStatusCode.NoContent);
         }
 
-        private bool RentalMovieExists(int id)
+
+        private bool RentalMovieExists(int rentalId, int movieId)
         {
-            return db.RentalMovies.Any(rm => rm.rental_id == id);
+            return db.RentalMovies.Any(rm => rm.rental_id == rentalId && rm.movie_id == movieId);
         }
+
 
 
     }
