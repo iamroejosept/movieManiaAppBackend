@@ -13,6 +13,7 @@ namespace movieManiaAppBackend.Models
         public DateTime? rental_date { get; set; }
         public DateTime? return_date { get; set; }
         public string status { get; set; }
+        public decimal? total_price { get; set; }
 
         // Navigation properties
         public virtual Customers Customer { get; set; }

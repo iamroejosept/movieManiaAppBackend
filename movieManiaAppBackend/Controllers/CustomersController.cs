@@ -45,7 +45,7 @@ namespace movieManiaAppBackend.Controllers
             
             if (!ModelState.IsValidField("email") || !ModelState.IsValidField("first_name")
              || !ModelState.IsValidField("last_name") || !ModelState.IsValidField("date_of_birth")
-             || !ModelState.IsValidField("address"))
+             || !ModelState.IsValidField("address") || !ModelState.IsValidField("contact_number"))
             {
                 return BadRequest(ModelState);
             }
@@ -102,6 +102,11 @@ namespace movieManiaAppBackend.Controllers
             if (!string.IsNullOrEmpty(customer.address))
             {
                 existingCustomer.address = customer.address;
+            }
+
+            if (!string.IsNullOrEmpty(customer.contact_number))
+            {
+                existingCustomer.contact_number = customer.contact_number;
             }
 
             try

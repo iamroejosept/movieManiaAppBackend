@@ -15,6 +15,7 @@ namespace movieManiaAppBackend.Models
         public string last_name { get; set; }
         public DateTime? date_of_birth { get; set; }
         public string address { get; set; }
+        public string contact_number { get; set; }
 
         // Navigation property
         public virtual ICollection<Rentals> Rentals { get; set; }

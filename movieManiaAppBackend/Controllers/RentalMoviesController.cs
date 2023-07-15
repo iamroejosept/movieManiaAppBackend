@@ -43,11 +43,22 @@ namespace movieManiaAppBackend.Controllers
         public IHttpActionResult PostRentalMovie(RentalMovies rentalmovie)
         {
             if (!ModelState.IsValidField("rental_id") || !ModelState.IsValidField("movie_id")
-              || !ModelState.IsValidField("individualstatus"))
+              || !ModelState.IsValidField("individualstatus") || !ModelState.IsValidField("price"))
             {
                 return BadRequest(ModelState);
             }
 
+            // Retrieve the movie from the database based on the movie_id
+            var movie = db.Movies.FirstOrDefault(m => m.movie_id == rentalmovie.movie_id);
+
+            // Check if there is enough stock of the movie
+            if (movie.stock <= 0)
+            {
+                return BadRequest("Movie out of stock.");
+            }
+
+            // Decrease the stock of the movie by 1
+            movie.stock--;
 
             db.RentalMovies.Add(rentalmovie);
             db.SaveChanges();
@@ -73,6 +84,17 @@ namespace movieManiaAppBackend.Controllers
             {
                 existingRentalMovie.individualstatus = rentalmovie.individualstatus;
             }
+
+            if (rentalmovie.price != null)
+            {
+                existingRentalMovie.price = rentalmovie.price;
+            }
+
+            // Retrieve the movie from the database based on the movie_id
+            var movie = db.Movies.FirstOrDefault(m => m.movie_id == movieId);
+
+            // Decrease the stock of the movie by 1
+            movie.stock++;
 
             try
             {

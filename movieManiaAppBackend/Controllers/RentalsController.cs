@@ -44,7 +44,8 @@ namespace movieManiaAppBackend.Controllers
         {
 
             if (!ModelState.IsValidField("customer_id") || !ModelState.IsValidField("rental_date")
-             || !ModelState.IsValidField("return_date") || !ModelState.IsValidField("status"))
+             || !ModelState.IsValidField("return_date") || !ModelState.IsValidField("status")
+             || !ModelState.IsValidField("total_price"))
             {
                 return BadRequest(ModelState);
             }
@@ -96,6 +97,11 @@ namespace movieManiaAppBackend.Controllers
             if (!string.IsNullOrEmpty(rental.status))
             {
                 existingRental.status = rental.status;
+            }
+
+            if (rental.total_price != null)
+            {
+                existingRental.total_price = rental.total_price;
             }
 
             try

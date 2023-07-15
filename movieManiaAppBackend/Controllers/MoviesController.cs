@@ -44,7 +44,9 @@ namespace movieManiaAppBackend.Controllers
         {
 
             if (!ModelState.IsValidField("title") || !ModelState.IsValidField("price")
-             || !ModelState.IsValidField("stock"))
+             || !ModelState.IsValidField("stock") || !ModelState.IsValidField("release_date")
+             || !ModelState.IsValidField("genre") || !ModelState.IsValidField("director")
+             || !ModelState.IsValidField("actors"))
             {
                 return BadRequest(ModelState);
             }
@@ -81,6 +83,26 @@ namespace movieManiaAppBackend.Controllers
             if (!string.IsNullOrEmpty(movie.title))
             {
                 existingMovie.title = movie.title;
+            }
+
+            if (!string.IsNullOrEmpty(movie.genre))
+            {
+                existingMovie.genre = movie.genre;
+            }
+
+            if (!string.IsNullOrEmpty(movie.director))
+            {
+                existingMovie.director = movie.director;
+            }
+
+            if (!string.IsNullOrEmpty(movie.actors))
+            {
+                existingMovie.actors = movie.actors;
+            }
+
+            if (movie.release_date.HasValue)
+            {
+                existingMovie.release_date = movie.release_date;
             }
 
             if (movie.price != null)
