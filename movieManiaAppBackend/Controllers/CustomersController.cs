@@ -21,10 +21,36 @@ namespace movieManiaAppBackend.Controllers
         }
 
         // GET api/customers
-        public IHttpActionResult GetCustomers()
+        public IHttpActionResult GetCustomersAll()
         {
             List<Customers> customers = db.Customers.OrderByDescending(c => c.customer_id).ToList();
             return Ok(customers);
+        }
+
+        //GET api/customers/{page}/{limit}
+        public IHttpActionResult GetCustomers(int page, int limit)
+        {
+            // Calculate the number of records to skip based on the page and pageSize
+            int skip = (page - 1) * limit;
+
+            // Retrieve customers based on the calculated skip and pageSize
+            List<Customers> customers = db.Customers
+                .OrderByDescending(c => c.customer_id)
+                .Skip(skip)
+                .Take(limit)
+                .ToList();
+
+            // Retrieve the total number of customers
+            int totalRecords = db.Customers.Count();
+
+            // Create a response object containing the customers and total number of records
+            var response = new
+            {
+                data = customers,
+                total = totalRecords
+            };
+
+            return Ok(response);
         }
 
         // GET api/customers/{id}
