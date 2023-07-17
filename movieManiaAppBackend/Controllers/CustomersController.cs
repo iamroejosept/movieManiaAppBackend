@@ -30,20 +30,33 @@ namespace movieManiaAppBackend.Controllers
 
         //GET api/customers/{page}/{limit}
         [HttpGet]
-        public IHttpActionResult GetCustomersPagination(int page, int limit)
+        public IHttpActionResult GetCustomersPagination(int page, int limit, string search = null)
         {
             // Calculate the number of records to skip based on the page and pageSize
             int skip = (page - 1) * limit;
 
+            // Create a queryable object for the customers
+            IQueryable<Customers> query = db.Customers.OrderByDescending(c => c.customer_id);
+
+            // Apply the search filter if a value is provided
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(c =>
+                    (c.first_name + " " + c.last_name).Contains(search) ||
+                    c.email.Contains(search) ||
+                    c.date_of_birth.ToString().Contains(search) ||
+                    c.address.Contains(search) ||
+                    c.contact_number.Contains(search));
+            }
+
             // Retrieve customers based on the calculated skip and pageSize
-            List<Customers> customers = db.Customers
-                .OrderByDescending(c => c.customer_id)
+            List<Customers> customers = query
                 .Skip(skip)
                 .Take(limit)
                 .ToList();
 
             // Retrieve the total number of customers
-            int totalRecords = db.Customers.Count();
+            int totalRecords = query.Count();
 
             // Create a response object containing the customers and total number of records
             var response = new
@@ -54,6 +67,7 @@ namespace movieManiaAppBackend.Controllers
 
             return Ok(response);
         }
+
 
         // GET api/customers/{id}
         [HttpGet]

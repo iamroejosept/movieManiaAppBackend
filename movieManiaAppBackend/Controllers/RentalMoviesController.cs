@@ -30,21 +30,33 @@ namespace movieManiaAppBackend.Controllers
 
         //GET api/rentalmovies/{page}/{limit}
         [HttpGet]
-        public IHttpActionResult GetRentalMoviesPagination(int id, int page, int limit)
+        public IHttpActionResult GetRentalMoviesPagination(int id, int page, int limit, string search = null)
         {
             // Calculate the number of records to skip based on the page and pageSize
             int skip = (page - 1) * limit;
 
-            // Retrieve rentalmovies based on the calculated skip, pageSize, and rental_id
-            List<RentalMovies> rentalmovies = db.RentalMovies
+            // Create a queryable object for the rentalmovies
+            IQueryable<RentalMovies> query = db.RentalMovies
                 .Where(rm => rm.rental_id == id)
-                .OrderByDescending(rm => rm.rental_id)
+                .OrderByDescending(rm => rm.rental_id);
+
+            // Apply the search filter if a value is provided
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(rm =>
+                    rm.Movie.title.Contains(search) ||
+                    rm.individualstatus.Contains(search) ||
+                    rm.price.ToString().Contains(search));
+            }
+
+            // Retrieve rentalmovies based on the calculated skip and pageSize
+            List<RentalMovies> rentalmovies = query
                 .Skip(skip)
                 .Take(limit)
                 .ToList();
 
-            // Retrieve the total number of rentalmoves with the specific rental_id
-            int totalRecords = db.RentalMovies.Count(rm => rm.rental_id == id);
+            // Retrieve the total number of rentalmovies
+            int totalRecords = query.Count();
 
             // Create a response object containing the rentalmovies and total number of records
             var response = new

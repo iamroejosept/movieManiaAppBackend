@@ -30,20 +30,35 @@ namespace movieManiaAppBackend.Controllers
 
         //GET api/movies/{page}/{limit}
         [HttpGet]
-        public IHttpActionResult GetMoviesPagination(int page, int limit)
+        public IHttpActionResult GetMoviesPagination(int page, int limit, string search = null)
         {
             // Calculate the number of records to skip based on the page and pageSize
             int skip = (page - 1) * limit;
 
+            // Create a queryable object for the movies
+            IQueryable<Movies> query = db.Movies.OrderByDescending(m => m.movie_id);
+
+            // Apply the search filter if a value is provided
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(m =>
+                    m.title.Contains(search) ||
+                    m.director.Contains(search) ||
+                    m.genre.Contains(search) ||
+                    m.release_date.ToString().Contains(search) ||
+                    m.actors.Contains(search) ||
+                    m.stock.ToString().Contains(search) ||
+                    m.price.ToString().Contains(search));
+            }
+
             // Retrieve movies based on the calculated skip and pageSize
-            List<Movies> movies = db.Movies
-                .OrderByDescending(m => m.movie_id)
+            List<Movies> movies = query
                 .Skip(skip)
                 .Take(limit)
                 .ToList();
 
             // Retrieve the total number of movies
-            int totalRecords = db.Movies.Count();
+            int totalRecords = query.Count();
 
             // Create a response object containing the movies and total number of records
             var response = new
