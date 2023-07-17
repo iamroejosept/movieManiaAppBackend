@@ -20,14 +20,44 @@ namespace movieManiaAppBackend.Controllers
         }
 
         // GET api/rentalmovies
-        public IHttpActionResult GetRentalMovies()
+        [HttpGet]
+        public IHttpActionResult GetRentalMoviesAll()
         {
             List<RentalMovies> rentalmovies = db.RentalMovies.OrderByDescending(rm => rm.rental_id).ToList();
 
             return Ok(rentalmovies);
         }
 
+        //GET api/rentalmovies/{page}/{limit}
+        [HttpGet]
+        public IHttpActionResult GetRentalMoviesPagination(int id, int page, int limit)
+        {
+            // Calculate the number of records to skip based on the page and pageSize
+            int skip = (page - 1) * limit;
+
+            // Retrieve rentalmovies based on the calculated skip, pageSize, and rental_id
+            List<RentalMovies> rentalmovies = db.RentalMovies
+                .Where(rm => rm.rental_id == id)
+                .OrderByDescending(rm => rm.rental_id)
+                .Skip(skip)
+                .Take(limit)
+                .ToList();
+
+            // Retrieve the total number of rentalmoves with the specific rental_id
+            int totalRecords = db.RentalMovies.Count(rm => rm.rental_id == id);
+
+            // Create a response object containing the rentalmovies and total number of records
+            var response = new
+            {
+                data = rentalmovies,
+                total = totalRecords
+            };
+
+            return Ok(response);
+        }
+
         // GET api/rentalmovies/{id}
+        [HttpGet]
         public IHttpActionResult GetRentalMovie(int id)
         {
             List<RentalMovies> rentalMovies = db.RentalMovies.Where(rm => rm.rental_id == id).ToList();

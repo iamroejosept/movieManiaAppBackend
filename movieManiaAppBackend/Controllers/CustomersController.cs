@@ -21,6 +21,7 @@ namespace movieManiaAppBackend.Controllers
         }
 
         // GET api/customers
+        [HttpGet]
         public IHttpActionResult GetCustomersAll()
         {
             List<Customers> customers = db.Customers.OrderByDescending(c => c.customer_id).ToList();
@@ -28,7 +29,8 @@ namespace movieManiaAppBackend.Controllers
         }
 
         //GET api/customers/{page}/{limit}
-        public IHttpActionResult GetCustomers(int page, int limit)
+        [HttpGet]
+        public IHttpActionResult GetCustomersPagination(int page, int limit)
         {
             // Calculate the number of records to skip based on the page and pageSize
             int skip = (page - 1) * limit;
@@ -54,6 +56,7 @@ namespace movieManiaAppBackend.Controllers
         }
 
         // GET api/customers/{id}
+        [HttpGet]
         public IHttpActionResult GetCustomer(int id)
         {
             Customers customer = db.Customers.FirstOrDefault(c => c.customer_id == id);

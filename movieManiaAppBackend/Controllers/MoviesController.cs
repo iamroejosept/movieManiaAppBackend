@@ -21,13 +21,42 @@ namespace movieManiaAppBackend.Controllers
         }
 
         // GET api/movies
-        public IHttpActionResult GetMovies()
+        [HttpGet]
+        public IHttpActionResult GetMoviesAll()
         {
             List<Movies> movies = db.Movies.OrderByDescending(m => m.movie_id).ToList();
             return Ok(movies);
         }
 
+        //GET api/movies/{page}/{limit}
+        [HttpGet]
+        public IHttpActionResult GetMoviesPagination(int page, int limit)
+        {
+            // Calculate the number of records to skip based on the page and pageSize
+            int skip = (page - 1) * limit;
+
+            // Retrieve movies based on the calculated skip and pageSize
+            List<Movies> movies = db.Movies
+                .OrderByDescending(m => m.movie_id)
+                .Skip(skip)
+                .Take(limit)
+                .ToList();
+
+            // Retrieve the total number of movies
+            int totalRecords = db.Movies.Count();
+
+            // Create a response object containing the movies and total number of records
+            var response = new
+            {
+                data = movies,
+                total = totalRecords
+            };
+
+            return Ok(response);
+        }
+
         // GET api/movies/{id}
+        [HttpGet]
         public IHttpActionResult GetMovie(int id)
         {
             Movies movie = db.Movies.FirstOrDefault(m => m.movie_id == id);
