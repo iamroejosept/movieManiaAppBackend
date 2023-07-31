@@ -46,6 +46,7 @@ namespace movieManiaAppBackend.Controllers
                 query = query.Where(rm =>
                     rm.Movie.title.Contains(search) ||
                     rm.individualstatus.Contains(search) ||
+                    rm.return_date.ToString().Contains(search) ||
                     rm.price.ToString().Contains(search));
             }
 
@@ -85,7 +86,8 @@ namespace movieManiaAppBackend.Controllers
         public IHttpActionResult PostRentalMovie(RentalMovies rentalmovie)
         {
             if (!ModelState.IsValidField("rental_id") || !ModelState.IsValidField("movie_id")
-              || !ModelState.IsValidField("individualstatus") || !ModelState.IsValidField("price"))
+              || !ModelState.IsValidField("individualstatus") || !ModelState.IsValidField("return_date")
+              || !ModelState.IsValidField("price"))
             {
                 return BadRequest(ModelState);
             }
@@ -125,6 +127,11 @@ namespace movieManiaAppBackend.Controllers
             if (!string.IsNullOrEmpty(rentalmovie.individualstatus))
             {
                 existingRentalMovie.individualstatus = rentalmovie.individualstatus;
+            }
+
+            if (rentalmovie.return_date != null)
+            {
+                existingRentalMovie.return_date = rentalmovie.return_date;
             }
 
             if (rentalmovie.price != null)
